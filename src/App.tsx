@@ -1,9 +1,13 @@
+import { RouterProvider } from 'react-router';
+
+import router from './route';
+
 import './App.css';
 
 function App() {
   return (
     <>
-      <h1>Optimized Virtualized Masonry Grid</h1>
+      <RouterProvider router={router} />
     </>
   );
 }
