@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router';
 
 import IndexedDbService from '../../../services/IndexedDb'; // Import the IndexedDB service
 import { GridItemContainer } from '../Grid.styled';
@@ -87,7 +88,9 @@ const GridItem: React.FC<GridItemProps> = ({ image }) => {
       ref={itemRef}
     >
       {isVisible && imageBlobUrl && (
-        <img src={imageBlobUrl} alt={image.alt || 'Photo'} loading="lazy" />
+        <Link to={`/photo/${image.id}`}>
+          <img src={imageBlobUrl} alt={image.alt || 'Photo'} loading="lazy" />
+        </Link>
       )}
     </GridItemContainer>
   );

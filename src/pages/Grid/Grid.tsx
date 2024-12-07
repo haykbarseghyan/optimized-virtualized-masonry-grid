@@ -7,7 +7,7 @@ import GridItem from './components/GridItem';
 import { masonryGrid } from './utils';
 
 const Grid = () => {
-  const lock = useRef<boolean>(false);
+  const lock = useRef<boolean>(true);
   const [page, setPage] = useState(1);
   const [allPhotos, setAllPhotos] = useState<Photo[]>([]);
   const [hasMorePhotos, setHasMorePhotos] = useState(true);
@@ -16,6 +16,7 @@ const Grid = () => {
     perPage: 15,
     page,
   });
+  console.log('data', data);
   const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -42,6 +43,12 @@ const Grid = () => {
   );
 
   useEffect(() => {
+    setTimeout(() => {
+      lock.current = false;
+    }, 100);
+  }, []);
+
+  useEffect(() => {
     if (!hasMorePhotos) return;
     const observer = new IntersectionObserver(loadMorePhotos, {
       threshold: 1.0,
@@ -58,7 +65,11 @@ const Grid = () => {
     };
   }, [loadMorePhotos, hasMorePhotos]);
 
-  const grid = useMemo(() => masonryGrid(allPhotos, 300, 2), [allPhotos]);
+  // TODO fix
+  const grid = useMemo(
+    () => masonryGrid([...new Set(allPhotos)], 300, 3),
+    [allPhotos],
+  );
 
   return (
     <div>

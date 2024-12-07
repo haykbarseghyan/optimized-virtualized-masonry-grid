@@ -1,4 +1,4 @@
-import { Grid } from './lazies.ts';
+import { Grid, Photo } from './lazies.ts';
 import RouteWrapper from './RouteWrapper.tsx';
 
 const routes = [
@@ -11,10 +11,10 @@ const routes = [
     ),
   },
   {
-    path: '/preview/:id',
+    path: '/photo/:id',
     element: (
       <RouteWrapper>
-        <></>
+        <Photo />
       </RouteWrapper>
     ),
   },
