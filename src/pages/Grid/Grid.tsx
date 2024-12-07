@@ -7,8 +7,10 @@ import GridItem from './components/GridItem';
 import { masonryGrid } from './utils';
 
 const Grid = () => {
+  const lock = useRef<boolean>(false);
   const [page, setPage] = useState(1);
   const [allPhotos, setAllPhotos] = useState<Photo[]>([]);
+  const [hasMorePhotos, setHasMorePhotos] = useState(true);
   const { data, isLoading, isFetching } = useGetPhotosQuery({
     query: 'nature',
     perPage: 15,
@@ -19,19 +21,28 @@ const Grid = () => {
   useEffect(() => {
     if (data?.photos) {
       setAllPhotos((prevPhotos) => [...prevPhotos, ...data.photos]);
+      if (data.photos.length === 0) {
+        setHasMorePhotos(false);
+      }
     }
   }, [data]);
 
   const loadMorePhotos = useCallback(
     (entries: IntersectionObserverEntry[]) => {
-      if (entries[0].isIntersecting && !isFetching) {
+      if (entries[0].isIntersecting && !isFetching && !lock.current) {
+        console.log('Loading more photos...');
         setPage((prevPage) => prevPage + 1);
+        lock.current = true;
+        setTimeout(() => {
+          lock.current = false;
+        }, 1000);
       }
     },
     [isFetching],
   );
 
   useEffect(() => {
+    if (!hasMorePhotos) return;
     const observer = new IntersectionObserver(loadMorePhotos, {
       threshold: 1.0,
     });
@@ -45,7 +56,7 @@ const Grid = () => {
         observer.unobserve(loaderRef.current);
       }
     };
-  }, [loadMorePhotos]);
+  }, [loadMorePhotos, hasMorePhotos]);
 
   const grid = useMemo(() => masonryGrid(allPhotos, 300, 2), [allPhotos]);
 
@@ -70,7 +81,7 @@ const Grid = () => {
 
       {isLoading && <p>Loading...</p>}
 
-      {!isFetching && (
+      {!isFetching && hasMorePhotos && (
         <div ref={loaderRef} style={{ height: '20px', margin: '20px 0' }} />
       )}
     </div>
