@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 
+import IndexedDbService from '../../../services/IndexedDb'; // Import the IndexedDB service
 import { GridItemContainer } from '../Grid.styled';
 import { GridImage } from '../types';
+
+const dbService = new IndexedDbService('PhotoDB', 'photos');
 
 interface GridItemProps {
   image: GridImage;
@@ -10,6 +13,7 @@ interface GridItemProps {
 const GridItem: React.FC<GridItemProps> = ({ image }) => {
   const itemRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [imageBlobUrl, setImageBlobUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -21,7 +25,7 @@ const GridItem: React.FC<GridItemProps> = ({ image }) => {
           setIsVisible(false);
         }
       },
-      { threshold: 0.1 }, // Adjust threshold as needed
+      { threshold: 0.1 },
     );
 
     if (itemRef.current) {
@@ -35,6 +39,46 @@ const GridItem: React.FC<GridItemProps> = ({ image }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (image.src.large) {
+      // Check IndexedDB for the image blob
+      const fetchAndStoreImage = async () => {
+        try {
+          const existingBlob = await dbService.getBlob(image.id.toString());
+
+          if (existingBlob) {
+            // Use the blob if it exists in IndexedDB
+            const blobUrl = URL.createObjectURL(existingBlob);
+            setImageBlobUrl(blobUrl);
+          } else {
+            // Fetch the image, save it as a blob, and store it in IndexedDB
+            const response = await fetch(image.src.large);
+            const blob = await response.blob();
+            await dbService.addBlob(image.id.toString(), blob);
+            const blobUrl = URL.createObjectURL(blob);
+            setImageBlobUrl(blobUrl);
+          }
+        } catch (error) {
+          console.error(
+            `Error fetching or storing the image with id ${image.id}:`,
+            error,
+          );
+        }
+      };
+
+      fetchAndStoreImage();
+    }
+  }, [image.src.large, image.id]);
+
+  useEffect(() => {
+    // Cleanup blob URL to prevent memory leaks
+    return () => {
+      if (imageBlobUrl) {
+        URL.revokeObjectURL(imageBlobUrl);
+      }
+    };
+  }, [imageBlobUrl]);
+
   return (
     <GridItemContainer
       width={image.scaledWidth}
@@ -42,13 +86,8 @@ const GridItem: React.FC<GridItemProps> = ({ image }) => {
       isVisible={isVisible}
       ref={itemRef}
     >
-      {isVisible && (
-        <img
-          src={image.src.large}
-          alt={image.alt || 'Photo'}
-          style={{}}
-          loading="lazy"
-        />
+      {isVisible && imageBlobUrl && (
+        <img src={imageBlobUrl} alt={image.alt || 'Photo'} loading="lazy" />
       )}
     </GridItemContainer>
   );

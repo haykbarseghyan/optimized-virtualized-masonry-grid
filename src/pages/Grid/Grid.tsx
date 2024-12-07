@@ -35,7 +35,7 @@ const Grid = () => {
         lock.current = true;
         setTimeout(() => {
           lock.current = false;
-        }, 1000);
+        }, 100);
       }
     },
     [isFetching],
