@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 
 import IndexedDbService from '../../../services/IndexedDb';
-import { GridItemContainer } from '../Grid.styled';
+import { GridItemContainer, Skeleton } from '../Grid.styled';
 import { GridImage } from '../types';
 
 const dbService = new IndexedDbService<GridImage>('PhotoDB', 'photos');
@@ -91,10 +91,12 @@ const GridItem: React.FC<GridItemProps> = ({ image }) => {
       isVisible={isVisible}
       ref={itemRef}
     >
-      {isVisible && imageBlobUrl && (
+      {isVisible && imageBlobUrl ? (
         <Link to={`/photo/${image.id}`}>
           <img src={imageBlobUrl} alt={image.alt || 'Photo'} loading="lazy" />
         </Link>
+      ) : (
+        <Skeleton />
       )}
     </GridItemContainer>
   );

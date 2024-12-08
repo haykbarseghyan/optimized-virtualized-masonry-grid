@@ -1,3 +1,5 @@
+import { keyframes } from '@emotion/react';
+
 import styled from '@emotion/styled';
 
 export const GridItemContainer = styled('div', {
@@ -42,3 +44,38 @@ export const SearchStyled = styled('div')(() => ({
     marginLeft: '10px',
   },
 }));
+
+const loadingAnimation = keyframes`
+0% {
+  left: -150px;
+}
+100% {
+  left: 100%;
+}
+`;
+
+export const Skeleton = styled.div`
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+
+  &::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: -150px;
+    height: 100%;
+    width: 150px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.6),
+      transparent
+    );
+    animation: ${loadingAnimation} 1.5s infinite;
+  }
+`;
