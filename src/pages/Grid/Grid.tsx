@@ -10,6 +10,7 @@ import { useGetPhotosQuery } from '../../store/photos/photosApi';
 import { Photo } from '../../store/photos/types';
 
 import GridItem from './components/GridItem';
+import Search from './components/Search';
 import { getDynamicColumns, masonryGrid } from './utils';
 
 const Grid: React.FC = () => {
@@ -19,8 +20,9 @@ const Grid: React.FC = () => {
   const [hasMorePhotos, setHasMorePhotos] = useState<boolean>(true);
   const [columns, setColumns] = useState<number>(3);
 
+  const [searchQuery, setSearchQuery] = useState('star wars');
   const { data, isLoading, isFetching } = useGetPhotosQuery({
-    query: 'nature',
+    query: searchQuery,
     perPage: 15,
     page,
   });
@@ -92,28 +94,40 @@ const Grid: React.FC = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-        {grid.map((column, columnIndex) => (
-          <div
-            key={columnIndex}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '15px',
-            }}
-          >
-            {column.map((image) => (
-              <GridItem key={image.id} image={image} />
-            ))}
-          </div>
-        ))}
+      <Search
+        callback={(query) => {
+          const queryText = query.trim();
+          if (queryText) {
+            setSearchQuery(queryText);
+            setPage(1);
+            setAllPhotos([]);
+          }
+        }}
+      />
+      <div style={{ marginTop: '40px' }}>
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+          {grid.map((column, columnIndex) => (
+            <div
+              key={columnIndex}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '15px',
+              }}
+            >
+              {column.map((image) => (
+                <GridItem key={image.id} image={image} />
+              ))}
+            </div>
+          ))}
+        </div>
+
+        {isLoading && <p>Loading...</p>}
+
+        {!isFetching && hasMorePhotos && (
+          <div ref={loaderRef} style={{ height: '20px', margin: '20px 0' }} />
+        )}
       </div>
-
-      {isLoading && <p>Loading...</p>}
-
-      {!isFetching && hasMorePhotos && (
-        <div ref={loaderRef} style={{ height: '20px', margin: '20px 0' }} />
-      )}
     </div>
   );
 };
