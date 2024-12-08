@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 
 import IndexedDbService from '../../../services/IndexedDb';
+import ImageWorker from '../../../services/WebWorker/imageWorker?worker'; // Vite-specific syntax
 import { GridItemContainer } from '../Grid.styled';
 import { GridImage } from '../types';
 
@@ -42,37 +43,30 @@ const GridItem: React.FC<GridItemProps> = ({ image }) => {
 
   useEffect(() => {
     if (image.src.large) {
-      // Check IndexedDB for the image blob
-      const fetchAndStoreImage = async () => {
-        try {
-          const existingImage = await dbService.getItem(image.id.toString());
+      const worker = new ImageWorker();
 
-          if (existingImage && existingImage.src.blob) {
-            // Use the blob if it exists in IndexedDB
-            const blobUrl = URL.createObjectURL(existingImage.src.blob);
-            setImageBlobUrl(blobUrl);
-          } else {
-            // Fetch the image, save it as a blob, and store it in IndexedDB
-            const response = await fetch(image.src.large);
-            const blob = await response.blob();
-            // deep
-            const objectForSaving = JSON.parse(
-              JSON.stringify(image),
-            ) as GridImage;
-            objectForSaving.src.blob = blob;
-            await dbService.addItem(image.id.toString(), objectForSaving);
-            const blobUrl = URL.createObjectURL(blob);
-            setImageBlobUrl(blobUrl);
-          }
-        } catch (error) {
-          console.error(
-            `Error fetching or storing the image with id ${image.id}:`,
-            error,
-          );
+      worker.onmessage = (
+        event: MessageEvent<{ success: boolean; blob?: Blob; error?: string }>,
+      ) => {
+        const { success, blob, error } = event.data;
+
+        if (success && blob) {
+          const blobUrl = URL.createObjectURL(blob);
+          setImageBlobUrl(blobUrl);
+
+          // Save to IndexedDB asynchronously
+          const objectForSaving = JSON.parse(JSON.stringify(image));
+          objectForSaving.src.blob = blob;
+          dbService.addItem(image.id.toString(), objectForSaving);
+        } else {
+          console.error('Error loading image:', error);
         }
+
+        // Terminate the worker
+        worker.terminate();
       };
 
-      fetchAndStoreImage();
+      worker.postMessage({ imageSrc: image.src.large });
     }
   }, [image.src.large, image.id, image]);
 
@@ -93,7 +87,7 @@ const GridItem: React.FC<GridItemProps> = ({ image }) => {
     >
       {isVisible && imageBlobUrl && (
         <Link to={`/photo/${image.id}`}>
-          <img src={imageBlobUrl} alt={image.alt || 'Photo'} loading="lazy" />
+          <img src={imageBlobUrl} alt={image.alt || 'Photo'} />
         </Link>
       )}
     </GridItemContainer>
