@@ -31,6 +31,7 @@ export const masonryGrid = (
       scaledHeight,
       src: image.src,
       alt: image.alt,
+      photographer: image.photographer,
     });
 
     columnHeights[shortestColumnIndex] += scaledHeight;

@@ -14,6 +14,7 @@ export type GridImage = {
     tiny: string;
   };
   alt: string;
+  photographer: string;
 };
 
 export type MasonryColumn = GridImage[];

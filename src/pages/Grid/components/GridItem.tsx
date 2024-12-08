@@ -45,11 +45,11 @@ const GridItem: React.FC<GridItemProps> = ({ image }) => {
       // Check IndexedDB for the image blob
       const fetchAndStoreImage = async () => {
         try {
-          const existingBlob = await dbService.getItem(image.id.toString());
+          const existingImage = await dbService.getItem(image.id.toString());
 
-          if (existingBlob && existingBlob.src.blob) {
+          if (existingImage && existingImage.src.blob) {
             // Use the blob if it exists in IndexedDB
-            const blobUrl = URL.createObjectURL(existingBlob.src.blob);
+            const blobUrl = URL.createObjectURL(existingImage.src.blob);
             setImageBlobUrl(blobUrl);
           } else {
             // Fetch the image, save it as a blob, and store it in IndexedDB
