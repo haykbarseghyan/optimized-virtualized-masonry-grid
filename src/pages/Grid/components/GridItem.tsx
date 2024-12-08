@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 
-import IndexedDbService from '../../../services/IndexedDb'; // Import the IndexedDB service
+import IndexedDbService from '../../../services/IndexedDb';
 import { GridItemContainer } from '../Grid.styled';
 import { GridImage } from '../types';
 
-const dbService = new IndexedDbService('PhotoDB', 'photos');
+const dbService = new IndexedDbService<GridImage>('PhotoDB', 'photos');
 
 interface GridItemProps {
   image: GridImage;
@@ -45,17 +45,22 @@ const GridItem: React.FC<GridItemProps> = ({ image }) => {
       // Check IndexedDB for the image blob
       const fetchAndStoreImage = async () => {
         try {
-          const existingBlob = await dbService.getBlob(image.id.toString());
+          const existingBlob = await dbService.getItem(image.id.toString());
 
-          if (existingBlob) {
+          if (existingBlob && existingBlob.src.blob) {
             // Use the blob if it exists in IndexedDB
-            const blobUrl = URL.createObjectURL(existingBlob);
+            const blobUrl = URL.createObjectURL(existingBlob.src.blob);
             setImageBlobUrl(blobUrl);
           } else {
             // Fetch the image, save it as a blob, and store it in IndexedDB
             const response = await fetch(image.src.large);
             const blob = await response.blob();
-            await dbService.addBlob(image.id.toString(), blob);
+            // deep
+            const objectForSaving = JSON.parse(
+              JSON.stringify(image),
+            ) as GridImage;
+            objectForSaving.src.blob = blob;
+            await dbService.addItem(image.id.toString(), objectForSaving);
             const blobUrl = URL.createObjectURL(blob);
             setImageBlobUrl(blobUrl);
           }
@@ -69,10 +74,9 @@ const GridItem: React.FC<GridItemProps> = ({ image }) => {
 
       fetchAndStoreImage();
     }
-  }, [image.src.large, image.id]);
+  }, [image.src.large, image.id, image]);
 
   useEffect(() => {
-    // Cleanup blob URL to prevent memory leaks
     return () => {
       if (imageBlobUrl) {
         URL.revokeObjectURL(imageBlobUrl);

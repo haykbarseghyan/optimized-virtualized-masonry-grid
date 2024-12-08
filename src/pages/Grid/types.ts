@@ -3,6 +3,7 @@ export type GridImage = {
   scaledWidth: number;
   scaledHeight: number;
   src: {
+    blob?: Blob;
     original: string;
     large2x: string;
     large: string;

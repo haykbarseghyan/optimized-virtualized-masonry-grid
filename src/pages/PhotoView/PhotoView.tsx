@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
 import IndexedDbService from '../../services/IndexedDb';
+import { GridImage } from '../Grid/types';
 
-const dbService = new IndexedDbService('PhotoDB', 'photos');
+const dbService = new IndexedDbService<GridImage>('PhotoDB', 'photos');
 
 const PhotoView = () => {
   const { id } = useParams();
@@ -14,11 +15,11 @@ const PhotoView = () => {
     if (id) {
       const getStoreImage = async () => {
         try {
-          const existingBlob = await dbService.getBlob(id);
+          const existingBlob = await dbService.getItem(id);
 
-          if (existingBlob) {
+          if (existingBlob && existingBlob.src.blob) {
             // Use the blob if it exists in IndexedDB
-            const blobUrl = URL.createObjectURL(existingBlob);
+            const blobUrl = URL.createObjectURL(existingBlob.src.blob);
             setImageBlobUrl(blobUrl);
           }
         } catch (error) {
