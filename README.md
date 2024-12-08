@@ -29,3 +29,9 @@ v20.18.1 lts/iron
 ```bash
    npm run build
 ```
+
+## To Run test
+
+```bash
+   npm test
+```
