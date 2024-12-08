@@ -1,23 +1,43 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { useGetPhotosQuery } from '../../store/photos/photosApi';
 import { Photo } from '../../store/photos/types';
 
 import GridItem from './components/GridItem';
-import { masonryGrid } from './utils';
+import { getDynamicColumns, masonryGrid } from './utils';
 
-const Grid = () => {
+const Grid: React.FC = () => {
   const lock = useRef<boolean>(true);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState<number>(1);
   const [allPhotos, setAllPhotos] = useState<Photo[]>([]);
-  const [hasMorePhotos, setHasMorePhotos] = useState(true);
+  const [hasMorePhotos, setHasMorePhotos] = useState<boolean>(true);
+  const [columns, setColumns] = useState<number>(3);
+
   const { data, isLoading, isFetching } = useGetPhotosQuery({
     query: 'nature',
     perPage: 15,
     page,
   });
-  console.log('data', data);
-  const loaderRef = useRef<HTMLDivElement>(null);
+
+  const loaderRef = useRef<HTMLDivElement | null>(null);
+
+  const updateColumns = useCallback(() => {
+    const screenWidth = window.innerWidth;
+    const dynamicColumns = getDynamicColumns(screenWidth, 5, 300);
+    setColumns(dynamicColumns);
+  }, []);
+
+  useEffect(() => {
+    updateColumns(); // init
+    window.addEventListener('resize', updateColumns);
+    return () => window.removeEventListener('resize', updateColumns);
+  }, [updateColumns]);
 
   useEffect(() => {
     if (data?.photos) {
@@ -31,7 +51,6 @@ const Grid = () => {
   const loadMorePhotos = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       if (entries[0].isIntersecting && !isFetching && !lock.current) {
-        console.log('Loading more photos...');
         setPage((prevPage) => prevPage + 1);
         lock.current = true;
         setTimeout(() => {
@@ -65,10 +84,10 @@ const Grid = () => {
     };
   }, [loadMorePhotos, hasMorePhotos]);
 
-  // TODO fix
+  // Create the grid structure using the dynamic column count
   const grid = useMemo(
-    () => masonryGrid([...new Set(allPhotos)], 300, 3),
-    [allPhotos],
+    () => masonryGrid([...new Set(allPhotos)], 300, columns),
+    [allPhotos, columns],
   );
 
   return (

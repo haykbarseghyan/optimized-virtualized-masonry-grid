@@ -39,3 +39,13 @@ export const masonryGrid = (
 
   return columns;
 };
+
+// Utility function for dynamic column count
+export const getDynamicColumns = (
+  screenWidth: number,
+  maxColumns: number = 5,
+  baseWidth: number = 300,
+): number => {
+  const calculatedColumns = Math.floor(screenWidth / baseWidth);
+  return Math.min(Math.max(calculatedColumns, 1), maxColumns);
+};
