@@ -15,12 +15,17 @@ import { getDynamicColumns, masonryGrid } from './utils';
 
 const Grid: React.FC = () => {
   const lock = useRef<boolean>(true);
+
   const [page, setPage] = useState<number>(1);
+
   const [allPhotos, setAllPhotos] = useState<Photo[]>([]);
+
   const [hasMorePhotos, setHasMorePhotos] = useState<boolean>(true);
+
   const [columns, setColumns] = useState<number>(3);
 
   const [searchQuery, setSearchQuery] = useState('star wars');
+
   const { data, isLoading, isFetching } = useGetPhotosQuery({
     query: searchQuery,
     perPage: 15,
@@ -43,7 +48,12 @@ const Grid: React.FC = () => {
 
   useEffect(() => {
     if (data?.photos) {
-      setAllPhotos((prevPhotos) => [...prevPhotos, ...data.photos]);
+      setAllPhotos((prevPhotos) => {
+        const newPhotos = data.photos.filter(
+          (photo) => !prevPhotos.some((prevPhoto) => prevPhoto.id === photo.id),
+        );
+        return [...prevPhotos, ...newPhotos];
+      });
       if (data.photos.length === 0) {
         setHasMorePhotos(false);
       }

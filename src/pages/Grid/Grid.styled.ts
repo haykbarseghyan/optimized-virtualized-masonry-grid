@@ -9,7 +9,6 @@ export const GridItemContainer = styled('div', {
     border: '0.5px solid #fff',
     borderRadius: '7px',
     opacity: isVisible ? 1 : 0.5,
-    // transition: 'opacity 0.3s',
     '& img': {
       width: '100%',
       height: '100%',
