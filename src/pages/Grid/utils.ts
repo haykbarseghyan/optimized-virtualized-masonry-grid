@@ -1,7 +1,14 @@
 import { Photo } from '../../store/photos/types';
 
 import { MasonryColumn } from './types';
-
+/**
+ * Distributes images into a masonry grid layout.
+ *
+ * @param {Photo[]} images - Array of image objects to be arranged.
+ * @param {number} [columnWidth=300] - The width of each column in the grid.
+ * @param {number} [numColumns=3] - Number of columns in the grid.
+ * @returns {MasonryColumn[]} - Array of columns, each containing images arranged in a masonry layout.
+ */
 export const masonryGrid = (
   images: Photo[],
   columnWidth: number = 300,
@@ -40,7 +47,14 @@ export const masonryGrid = (
   return columns;
 };
 
-// Utility function for dynamic column count
+/**
+ * Calculates the number of columns dynamically based on screen width.
+ *
+ * @param {number} screenWidth - The current width of the screen in pixels.
+ * @param {number} [maxColumns=5] - The maximum number of columns allowed.
+ * @param {number} [baseWidth=300] - The base width of each column.
+ * @returns {number} - The calculated number of columns, constrained by the maximum allowed.
+ */
 export const getDynamicColumns = (
   screenWidth: number,
   maxColumns: number = 5,
