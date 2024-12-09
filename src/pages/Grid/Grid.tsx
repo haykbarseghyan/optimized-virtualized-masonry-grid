@@ -6,12 +6,16 @@ import React, {
   useState,
 } from 'react';
 
+import IndexedDbService from '../../services/IndexedDb';
 import { useGetPhotosQuery } from '../../store/photos/photosApi';
 import { Photo } from '../../store/photos/types';
 
 import GridItem from './components/GridItem';
 import Search from './components/Search';
+import { GridImage } from './types';
 import { getDynamicColumns, masonryGrid } from './utils';
+
+const dbService = new IndexedDbService<GridImage>('PhotoDB', 'photos');
 
 const Grid: React.FC = () => {
   const lock = useRef<boolean>(true);
@@ -108,9 +112,10 @@ const Grid: React.FC = () => {
         callback={(query) => {
           const queryText = query.trim();
           if (queryText) {
-            setSearchQuery(queryText);
+            dbService.clearStore();
             setPage(1);
             setAllPhotos([]);
+            setSearchQuery(queryText);
           }
         }}
       />

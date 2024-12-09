@@ -93,26 +93,17 @@ export default class IndexedDbService<T> {
   }
 
   /**
-   * Deletes the entire object store.
-   * Note: This operation requires a version upgrade of the database.
-   * @returns {Promise<void>} - A promise that resolves when the object store is deleted.
+   * Clears all items from the object store.
+   * @returns {Promise<void>} - A promise that resolves when all items are cleared.
    */
-  async deleteStore(): Promise<void> {
+  async clearStore(): Promise<void> {
+    const db = await this.getDb();
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.dbName);
+      const transaction = db.transaction(this.storeName, 'readwrite');
+      const store = transaction.objectStore(this.storeName);
+      const request = store.clear();
 
-      request.onupgradeneeded = () => {
-        const db = request.result;
-        if (db.objectStoreNames.contains(this.storeName)) {
-          db.deleteObjectStore(this.storeName);
-        }
-      };
-
-      request.onsuccess = () => {
-        request.result.close();
-        resolve();
-      };
-
+      request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
     });
   }
