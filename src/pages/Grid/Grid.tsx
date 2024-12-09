@@ -20,12 +20,11 @@ const dbService = new IndexedDbService<GridImage>('PhotoDB', 'photos');
 
 const Grid: React.FC = () => {
   const lock = useRef<boolean>(true);
+  const hasMorePhotos = useRef<boolean>(true);
 
   const [page, setPage] = useState<number>(1);
 
   const [allPhotos, setAllPhotos] = useState<Photo[]>([]);
-
-  const [hasMorePhotos, setHasMorePhotos] = useState<boolean>(true);
 
   const [columns, setColumns] = useState<number>(3);
 
@@ -64,7 +63,7 @@ const Grid: React.FC = () => {
         return [...prevPhotos, ...newPhotos];
       });
       if (data.photos.length === 0) {
-        setHasMorePhotos(false);
+        hasMorePhotos.current = false;
       }
     }
   }, [data]);
@@ -89,7 +88,7 @@ const Grid: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!hasMorePhotos) return;
+    if (!hasMorePhotos.current) return;
     const observer = new IntersectionObserver(loadMorePhotos, {
       threshold: 1.0,
     });
@@ -103,7 +102,7 @@ const Grid: React.FC = () => {
         observer.unobserve(loaderRef.current);
       }
     };
-  }, [loadMorePhotos, hasMorePhotos]);
+  }, [loadMorePhotos]);
 
   // Create the grid structure using the dynamic column count
   const grid = useMemo(
@@ -144,7 +143,7 @@ const Grid: React.FC = () => {
 
         {isLoading && <p>Loading...</p>}
 
-        {!isFetching && hasMorePhotos && (
+        {!isFetching && hasMorePhotos.current && (
           <div ref={loaderRef} style={{ height: '20px', margin: '20px 0' }} />
         )}
       </div>
