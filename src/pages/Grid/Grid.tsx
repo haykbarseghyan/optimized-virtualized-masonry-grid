@@ -12,6 +12,7 @@ import { Photo } from '../../store/photos/types';
 
 import GridItem from './components/GridItem';
 import Search from './components/Search';
+import { COLUMN_SIZE, MAX_COLUMN_COUNT, PER_PAGE } from './constants';
 import { GridImage } from './types';
 import { getDynamicColumns, masonryGrid } from './utils';
 
@@ -32,7 +33,7 @@ const Grid: React.FC = () => {
 
   const { data, isLoading, isFetching } = useGetPhotosQuery({
     query: searchQuery,
-    perPage: 15,
+    perPage: PER_PAGE,
     page,
   });
 
@@ -40,7 +41,11 @@ const Grid: React.FC = () => {
 
   const updateColumns = useCallback(() => {
     const screenWidth = window.innerWidth;
-    const dynamicColumns = getDynamicColumns(screenWidth, 5, 300);
+    const dynamicColumns = getDynamicColumns(
+      screenWidth,
+      MAX_COLUMN_COUNT,
+      COLUMN_SIZE,
+    );
     setColumns(dynamicColumns);
   }, []);
 
@@ -102,7 +107,7 @@ const Grid: React.FC = () => {
 
   // Create the grid structure using the dynamic column count
   const grid = useMemo(
-    () => masonryGrid([...new Set(allPhotos)], 300, columns),
+    () => masonryGrid([...new Set(allPhotos)], COLUMN_SIZE, columns),
     [allPhotos, columns],
   );
 
