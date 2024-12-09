@@ -103,6 +103,7 @@ const Grid: React.FC = () => {
             setPage(1);
             setAllPhotos([]);
             setSearchQuery(queryText);
+            hasMorePhotos.current = true;
           }
         }}
       />
@@ -127,11 +128,11 @@ const Grid: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           {isLoading && <p>Loading...</p>}
           {isError && <p>Something went wrong!</p>}
-
-          {data?.photos.length === 0 && allPhotos.length > 0 ? (
-            <p>No more photo!</p>
-          ) : (
-            <p>No photo!</p>
+          {data?.photos.length === 0 && (
+            <>
+              {allPhotos.length === 0 && <p>No photo!</p>}
+              {allPhotos.length > 0 && <p>No more photo!</p>}
+            </>
           )}
         </div>
 
