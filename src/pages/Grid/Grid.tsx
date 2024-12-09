@@ -19,7 +19,7 @@ import { masonryGrid } from './utils';
 
 const dbService = new IndexedDbService<GridImage>('PhotoDB', 'photos');
 
-const Grid: React.FC = () => {
+const Grid = () => {
   const lock = useRef<boolean>(true);
   const hasMorePhotos = useRef<boolean>(true);
 

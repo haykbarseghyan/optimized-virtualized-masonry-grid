@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 
 import IndexedDbService from '../../../services/IndexedDb';
@@ -7,11 +7,7 @@ import { GridImage } from '../types';
 
 const dbService = new IndexedDbService<GridImage>('PhotoDB', 'photos');
 
-interface GridItemProps {
-  image: GridImage;
-}
-
-const GridItem: React.FC<GridItemProps> = ({ image }) => {
+const GridItem = ({ image }: { image: GridImage }) => {
   const itemRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [imageBlobUrl, setImageBlobUrl] = useState<string | null>(null);
