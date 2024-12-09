@@ -106,7 +106,7 @@ const Grid: React.FC = () => {
 
   // Create the grid structure using the dynamic column count
   const grid = useMemo(
-    () => masonryGrid([...new Set(allPhotos)], COLUMN_SIZE, columns),
+    () => masonryGrid(allPhotos, COLUMN_SIZE, columns),
     [allPhotos, columns],
   );
 

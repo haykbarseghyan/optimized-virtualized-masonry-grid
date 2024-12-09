@@ -19,7 +19,7 @@ const PhotoView = () => {
       const getStoreImage = async () => {
         try {
           const existingImage = await dbService.getItem(id);
-          console.log(existingImage);
+
           if (existingImage && existingImage.src.blob) {
             // Use the blob if it exists in IndexedDB
             const blobUrl = URL.createObjectURL(existingImage.src.blob);
