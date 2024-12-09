@@ -6,15 +6,16 @@ import React, {
   useState,
 } from 'react';
 
+import useUpdateColumn from '../../hooks/useUpdateColumn';
 import IndexedDbService from '../../services/IndexedDb';
 import { useGetPhotosQuery } from '../../store/photos/photosApi';
 import { Photo } from '../../store/photos/types';
 
 import GridItem from './components/GridItem';
 import Search from './components/Search';
-import { COLUMN_SIZE, MAX_COLUMN_COUNT, PER_PAGE } from './constants';
+import { COLUMN_SIZE, PER_PAGE } from './constants';
 import { GridImage } from './types';
-import { getDynamicColumns, masonryGrid } from './utils';
+import { masonryGrid } from './utils';
 
 const dbService = new IndexedDbService<GridImage>('PhotoDB', 'photos');
 
@@ -26,10 +27,8 @@ const Grid: React.FC = () => {
 
   const [allPhotos, setAllPhotos] = useState<Photo[]>([]);
 
-  const [columns, setColumns] = useState<number>(3);
-
   const [searchQuery, setSearchQuery] = useState('star wars');
-
+  const { columns } = useUpdateColumn();
   const { data, isLoading, isFetching } = useGetPhotosQuery({
     query: searchQuery,
     perPage: PER_PAGE,
@@ -37,22 +36,6 @@ const Grid: React.FC = () => {
   });
 
   const loaderRef = useRef<HTMLDivElement | null>(null);
-
-  const updateColumns = useCallback(() => {
-    const screenWidth = window.innerWidth;
-    const dynamicColumns = getDynamicColumns(
-      screenWidth,
-      MAX_COLUMN_COUNT,
-      COLUMN_SIZE,
-    );
-    setColumns(dynamicColumns);
-  }, []);
-
-  useEffect(() => {
-    updateColumns(); // init
-    window.addEventListener('resize', updateColumns);
-    return () => window.removeEventListener('resize', updateColumns);
-  }, [updateColumns]);
 
   useEffect(() => {
     if (data?.photos) {
