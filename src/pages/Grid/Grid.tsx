@@ -29,7 +29,7 @@ const Grid: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState('star wars');
   const { columns } = useUpdateColumn();
-  const { data, isLoading, isFetching } = useGetPhotosQuery({
+  const { data, isLoading, isFetching, isError } = useGetPhotosQuery({
     query: searchQuery,
     perPage: PER_PAGE,
     page,
@@ -124,7 +124,16 @@ const Grid: React.FC = () => {
           ))}
         </div>
 
-        {isLoading && <p>Loading...</p>}
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          {isLoading && <p>Loading...</p>}
+          {isError && <p>Something went wrong!</p>}
+
+          {data?.photos.length === 0 && allPhotos.length > 0 ? (
+            <p>No more photo!</p>
+          ) : (
+            <p>No photo!</p>
+          )}
+        </div>
 
         {!isFetching && hasMorePhotos.current && (
           <div ref={loaderRef} style={{ height: '20px', margin: '20px 0' }} />
