@@ -2,8 +2,14 @@ import { useState } from 'react';
 
 import { SearchStyled } from '../Grid.styled';
 
-const Search = ({ callback }: { callback: (value: string) => void }) => {
-  const [query, setQuery] = useState<string>('');
+const Search = ({
+  searchQuery,
+  callback,
+}: {
+  searchQuery: string;
+  callback: (value: string) => void;
+}) => {
+  const [query, setQuery] = useState<string>(searchQuery);
 
   const handleSearch = () => {
     callback(query);

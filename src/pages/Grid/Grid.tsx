@@ -27,7 +27,9 @@ const Grid: React.FC = () => {
 
   const [allPhotos, setAllPhotos] = useState<Photo[]>([]);
 
-  const [searchQuery, setSearchQuery] = useState('star wars');
+  const [searchQuery, setSearchQuery] = useState(
+    localStorage.getItem('search') || 'star wars',
+  );
   const { columns } = useUpdateColumn();
   const { data, isLoading, isFetching, isError } = useGetPhotosQuery({
     query: searchQuery,
@@ -96,6 +98,7 @@ const Grid: React.FC = () => {
   return (
     <div>
       <Search
+        searchQuery={searchQuery}
         callback={(query) => {
           const queryText = query.trim();
           if (queryText) {
@@ -104,6 +107,7 @@ const Grid: React.FC = () => {
             setAllPhotos([]);
             setSearchQuery(queryText);
             hasMorePhotos.current = true;
+            localStorage.setItem('search', queryText);
           }
         }}
       />
