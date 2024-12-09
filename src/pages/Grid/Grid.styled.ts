@@ -24,14 +24,14 @@ export const SearchStyled = styled('div')(() => ({
   display: 'flex',
   alignItems: 'center',
   top: '20px',
-  left: '120px',
+  width: 'calc(100vw - 16px)',
+  justifyContent: 'center',
   '& input': {
-    width: '500px',
-    flex: 1,
     padding: '10px',
     fontSize: '16px',
     border: '1px solid #ccc',
     borderRadius: '4px',
+    width: 'calc(100vw - 300px)',
   },
   '& button': {
     padding: '10px 15px',

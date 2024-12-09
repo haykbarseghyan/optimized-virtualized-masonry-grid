@@ -106,7 +106,7 @@ const Grid: React.FC = () => {
           }
         }}
       />
-      <div style={{ marginTop: '40px' }}>
+      <div style={{ marginTop: '80px' }}>
         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
           {grid.map((column, columnIndex) => (
             <div
