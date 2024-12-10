@@ -35,3 +35,9 @@ v20.18.1 lts/iron
 ```bash
    npm test
 ```
+
+## Features:
+
+- **IndexedDB**: Used for saving and managing blob files offline.
+- **React Router**: Navigation between pages.
+- **RTK Query**: Simplifies API calls and data caching for better performance.
